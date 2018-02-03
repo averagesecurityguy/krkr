@@ -1,29 +1,20 @@
 package main
 
 import (
-	"bufio"
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
-	"os"
 	"strings"
 )
 
 func loadMongoCrHashes(filename string) []string {
 	var hashes []string
 
-	data, err := os.Open(filename)
-	if err != nil {
-		fmt.Printf("Could not load hashes: %s\n", filename)
-	}
+	data := readFile(filename)
 
-	defer data.Close()
-
-	scan := bufio.NewScanner(data)
-	for scan.Scan() {
-		text := scan.Text()
-		if text != "" {
-			hashes = append(hashes, text)
+	for _, line := range strings.Split(data, "\n") {
+		if line != "" {
+			hashes = append(hashes, line)
 		}
 	}
 

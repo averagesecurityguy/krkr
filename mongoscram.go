@@ -1,16 +1,15 @@
 package main
 
 import (
-	"bufio"
 	"crypto/hmac"
 	"crypto/md5"
 	"crypto/sha1"
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
-	"golang.org/x/crypto/pbkdf2"
-	"os"
 	"strings"
+
+	"golang.org/x/crypto/pbkdf2"
 )
 
 type Hash struct {
@@ -47,18 +46,11 @@ func parseMongoScramHash(hash string) string {
 func loadMongoScramHashes(filename string) []string {
 	var hashes []string
 
-	data, err := os.Open(filename)
-	if err != nil {
-		fmt.Printf("Could not load hashes: %s\n", filename)
-	}
+	data := readFile(filename)
 
-	defer data.Close()
-
-	scan := bufio.NewScanner(data)
-	for scan.Scan() {
-		text := scan.Text()
-		if text != "" {
-			hash := parseMongoScramHash(text)
+	for _, line := range strings.Split(data, "\n") {
+		if line != "" {
+			hash := parseMongoScramHash(line)
 			hashes = append(hashes, hash)
 		}
 	}

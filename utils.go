@@ -1,10 +1,9 @@
 package main
 
 import (
-	"bufio"
 	"encoding/hex"
 	"fmt"
-	"os"
+	"io/ioutil"
 	"strings"
 )
 
@@ -20,28 +19,35 @@ func decodeHex(hexData string) []byte {
 func loadWords(filename string) []string {
 	var words []string
 
-	wordlist, err := os.Open(filename)
-	if err != nil {
-		fmt.Printf("Could not open wordlist: %s\n", filename)
-		return words
-	}
-
-	defer wordlist.Close()
-
-	scan := bufio.NewScanner(wordlist)
-	for scan.Scan() {
-		text := scan.Text()
-
-		if strings.HasPrefix(text, "#") {
+	data := readFile(filename)
+	for _, line := range strings.Split(data, "\n") {
+		if line == "" {
 			continue
 		}
 
-		words = append(words, text)
+		if strings.HasPrefix(line, "#") {
+			continue
+		}
+
+		words = append(words, line)
 	}
 
 	return words
 }
 
-func testWords(words <-chan string, hashes []string, signal chan<- bool) {
+func readFile(filename string) string {
+	bytes, err := ioutil.ReadFile(filename)
+	if err != nil {
+		fmt.Printf("Could not read file: %s\n", filename)
+		return ""
+	}
 
+	data := string(bytes)
+
+	if len(data) == 0 {
+		fmt.Println("File contains no data.")
+		return ""
+	}
+
+	return data
 }

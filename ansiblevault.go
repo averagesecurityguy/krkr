@@ -5,7 +5,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-	"io/ioutil"
 	"strings"
 
 	"golang.org/x/crypto/pbkdf2"
@@ -23,18 +22,7 @@ func parseAnsibleVaultHash(data string) string {
 func loadAnsibleVaultHashes(filename string) []string {
 	var hashes []string
 
-	bytes, err := ioutil.ReadFile(filename)
-	if err != nil {
-		fmt.Printf("Could not load hashes: %s\n", filename)
-		return hashes
-	}
-
-	data := string(bytes)
-
-	if len(data) == 0 {
-		fmt.Println("Hash file contains no data.")
-		return hashes
-	}
+	data := readFile(filename)
 
 	if !strings.HasPrefix(data, "$ANSIBLE_VAULT;1.1;AES256") {
 		fmt.Println(data)
