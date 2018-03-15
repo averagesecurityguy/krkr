@@ -69,20 +69,6 @@ func parseMongoScramHash(hash string) string {
 	salt := parts[3]
 	expected := parts[4]
 
-	for {
-		if len(salt)%3 == 0 {
-			break
-		}
-		salt = salt + "="
-	}
-
-	for {
-		if len(expected)%3 == 0 {
-			break
-		}
-		expected = expected + "="
-	}
-
 	//Decode our salt
 	decoded, err := base64.StdEncoding.DecodeString(salt)
 	if err != nil {
