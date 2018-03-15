@@ -3,14 +3,14 @@ A Go based password cracker for odd hashes.
 
 ## Building
 
-* `git clone https://github.com/averagesecurityguy/cracker`
-* `cd cracker`
+* `git clone https://github.com/averagesecurityguy/krkr`
+* `cd krkr`
 * `go build`
 
 ## Usage
 
 ```
-Usage of ./cracker:
+Usage of ./krkr:
   -f string
     	File containing password hashes. (default "hashes.txt")
   -t string
