@@ -66,7 +66,7 @@ func main() {
 		}(wordList[i])
 	}
 
-	for range wordList {
+	for i:=0; i < (len(wordList) * len(hashList)); i++ {
 		<-signal
 	}
 }
