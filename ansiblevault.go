@@ -10,7 +10,7 @@ import (
 	"golang.org/x/crypto/pbkdf2"
 )
 
-type AnsibleVault struct {}
+type AnsibleVault struct{}
 
 func (a *AnsibleVault) Load(filename string) []string {
 	var hashes []string

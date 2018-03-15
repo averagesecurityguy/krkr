@@ -12,7 +12,7 @@ import (
 	"golang.org/x/crypto/pbkdf2"
 )
 
-type MongoScram struct {}
+type MongoScram struct{}
 
 // Parse the given file to get the mongo-scram hashes
 func (m *MongoScram) Load(filename string) []string {

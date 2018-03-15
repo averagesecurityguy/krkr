@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-type MongoCR struct {}
+type MongoCR struct{}
 
 func (m *MongoCR) Load(filename string) []string {
 	var hashes []string
