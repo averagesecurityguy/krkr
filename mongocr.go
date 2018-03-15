@@ -7,7 +7,9 @@ import (
 	"strings"
 )
 
-func loadMongoCrHashes(filename string) []string {
+type MongoCR struct {}
+
+func (m *MongoCR) Load(filename string) []string {
 	var hashes []string
 
 	data := readFile(filename)
@@ -21,15 +23,15 @@ func loadMongoCrHashes(filename string) []string {
 	return hashes
 }
 
-func calculateMongoCrHash(hash, password string) {
+func (m *MongoCR) Hash(hash, password string) {
 	parts := strings.Split(hash, ":")
 	user := parts[0]
 	target := parts[1]
 
 	str := fmt.Sprintf("%s:mongo:%s", user, password)
-	pwd_md5 := md5.New().Sum([]byte(str))
+	pwd_md5 := md5.Sum([]byte(str))
 
-	calculated := hex.EncodeToString(pwd_md5)
+	calculated := hex.EncodeToString(pwd_md5[:])
 
 	if target == calculated {
 		fmt.Printf("%s:%s\n", hash, password)
