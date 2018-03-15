@@ -10,16 +10,9 @@ import (
 	"golang.org/x/crypto/pbkdf2"
 )
 
-func parseAnsibleVaultHash(data string) string {
-	lines := strings.Split(data, "\n")
-	hexData := strings.Join(lines[1:], "")
-	decoded := decodeHex(hexData)
-	split := strings.Split(string(decoded), "\n")
+type AnsibleVault struct {}
 
-	return fmt.Sprintf("%s:%s:%s", split[0], split[1], split[2])
-}
-
-func loadAnsibleVaultHashes(filename string) []string {
+func (a *AnsibleVault) Load(filename string) []string {
 	var hashes []string
 
 	data := readFile(filename)
@@ -36,7 +29,7 @@ func loadAnsibleVaultHashes(filename string) []string {
 	return hashes
 }
 
-func calculateAnsibleVaultHash(hash, password string) {
+func (a *AnsibleVault) Hash(hash, password string) {
 	params := strings.Split(hash, ":")
 	salt := decodeHex(params[0])
 	target := params[1]
@@ -52,4 +45,13 @@ func calculateAnsibleVaultHash(hash, password string) {
 	if target == candidate {
 		fmt.Printf("%s:%s\n", hash, password)
 	}
+}
+
+func parseAnsibleVaultHash(data string) string {
+	lines := strings.Split(data, "\n")
+	hexData := strings.Join(lines[1:], "")
+	decoded := decodeHex(hexData)
+	split := strings.Split(string(decoded), "\n")
+
+	return fmt.Sprintf("%s:%s:%s", split[0], split[1], split[2])
 }
