@@ -1,1 +1,2 @@
-admin:admin:$scram$10000$/RvNLt7idKDYqnpgjrFDPA$O0vYca487a4JwOFxsYC4xkWR+Ro
+admin:admin:$scram$10000$/RvNLt7idKDYqnpgjrFDPA==$O0vYca487a4JwOFxsYC4xkWR+Ro=
+admin:test:$scram$10000$4lwAAO2i6neGV8OphKpDYQ==$NOp7p/jpShihGcemtrh38Xy8Vbs=
