@@ -4,7 +4,16 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"os/signal"
+	"sync"
 )
+
+const threads = 16
+
+type candidate struct {
+	word string
+	hash string
+}
 
 type cracker interface {
 	Load(string) []string
@@ -51,22 +60,41 @@ func main() {
 		os.Exit(0)
 	}
 
+	// Load our password candidates into a channel
+	var candidates = make(chan *candidate, len(wordList) * len(hashList))
+	for _, w := range wordList {
+		for _, h := range hashList {
+			candidates <- &candidate{word: w, hash: h}
+		}
+	}
+	close(candidates)
+
 	fmt.Printf("Loaded %d hashes.\n", len(hashList))
 	fmt.Printf("Loaded %d words.\n", len(wordList))
 
-	// Attempt to crack our passwords. Kick off one Go routine for each candidate
-	// password.
-	var signal = make(chan bool)
-	for i := range wordList {
-		go func(word string) {
-			for i := range hashList {
-				c.Hash(hashList[i], word)
-				signal <- true
+	// Listen for Ctrl-C and kill the program.
+	var sig = make(chan os.Signal, 1)
+    signal.Notify(sig, os.Interrupt)
+    go func() {
+        for _ = range sig {
+			os.Exit(1)
+		}
+    }()
+
+	// Start our threads for processing hashes.
+	var wg sync.WaitGroup
+
+	for i := 0; i < threads; i++ {
+		wg.Add(1)
+
+		go func() {
+			defer wg.Done()
+			for cnd := range candidates {
+				c.Hash(cnd.hash, cnd.word)
 			}
-		}(wordList[i])
+		}()
 	}
 
-	for i:=0; i < (len(wordList) * len(hashList)); i++ {
-		<-signal
-	}
+	// Wait for our workers to finish.
+	wg.Wait()
 }
