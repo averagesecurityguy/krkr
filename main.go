@@ -6,12 +6,16 @@ import (
 	"os"
 )
 
+type cracker interface {
+	Load(string) []string
+	Hash(string, string)
+}
+
 func main() {
 	var hashType string
 	var hashFile string
 	var wordFile string
-	var loader func(filename string) []string
-	var hasher func(hash, password string)
+	var c cracker
 
 	flag.StringVar(&hashType, "t", "none", "The type of hash to crack.")
 	flag.StringVar(&wordFile, "w", "words.txt", "Password list")
@@ -22,14 +26,11 @@ func main() {
 	// Set our loader and hasher functions based on the provided hash type
 	switch hashType {
 	case "ansible-vault":
-		loader = loadAnsibleVaultHashes
-		hasher = calculateAnsibleVaultHash
+		c = new(AnsibleVault)
 	case "mongo-scram":
-		loader = loadMongoScramHashes
-		hasher = calculateMongoScramHash
+		c = new(MongoScram)
 	case "mongo-cr":
-		loader = loadMongoCrHashes
-		hasher = calculateMongoCrHash
+		c = new(MongoCR)
 	default:
 		fmt.Println("Invalid hash type.")
 		flag.Usage()
@@ -37,7 +38,7 @@ func main() {
 	}
 
 	// Attempt to load our password hashes using the defined loader.
-	hashList := loader(hashFile)
+	hashList := c.Load(hashFile)
 	if len(hashList) == 0 {
 		fmt.Println("No password hashes loaded.")
 		os.Exit(0)
@@ -50,6 +51,7 @@ func main() {
 		os.Exit(0)
 	}
 
+	fmt.Printf("Loaded %d hashes.\n", len(hashList))
 	fmt.Printf("Loaded %d words.\n", len(wordList))
 
 	// Attempt to crack our passwords. Kick off one Go routine for each candidate
@@ -58,7 +60,7 @@ func main() {
 	for i := range wordList {
 		go func(word string) {
 			for i := range hashList {
-				hasher(hashList[i], word)
+				c.Hash(hashList[i], word)
 				signal <- true
 			}
 		}(wordList[i])
